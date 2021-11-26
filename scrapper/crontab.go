@@ -1,7 +1,6 @@
 package scrapper
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -24,7 +23,6 @@ func PeriodicScrapping() error {
 	}
 	_, err := cron.AddFunc(period, func() {
 		_, err := GetCurrentPrice(params, true)
-		fmt.Println("function executed")
 		if err != nil {
 			log.Print("Cant get current price: ", err)
 		}

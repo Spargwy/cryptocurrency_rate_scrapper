@@ -2,7 +2,6 @@ package api
 
 import (
 	"cryptorate/scrapper"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,16 +15,12 @@ func price(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Unavailable param %s", unavailableParam)
 		return
 	}
-	cryptocurrency, err := scrapper.GetCurrentPrice(r.URL.Query(), false)
+	response, err := scrapper.GetCurrentPrice(r.URL.Query(), false)
 	if err != nil {
 		log.Print("get current price error: ", err)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	jsonResp, err := json.Marshal(cryptocurrency)
-	if err != nil {
-		log.Print("MARSHAL ERROR IN price: ", err)
-	}
-	w.Write(jsonResp)
+	w.Write(response)
 }
 
 func SetupRoutes() {

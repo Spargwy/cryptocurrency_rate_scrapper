@@ -3,17 +3,14 @@ package scrapper
 import (
 	"cryptorate/storage"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-
-	"github.com/mitchellh/mapstructure"
 )
 
-func GetCurrentPrice(requestParams url.Values, saveToDB bool) (cryptocurrency storage.PriceMultyFull, err error) {
+func GetCurrentPrice(requestParams url.Values, saveToDB bool) (response []byte, err error) {
 	apiKey := os.Getenv("API_KEY")
 	url := "https://min-api.cryptocompare.com/data/pricemultifull"
 	method := "GET"
@@ -44,35 +41,61 @@ func GetCurrentPrice(requestParams url.Values, saveToDB bool) (cryptocurrency st
 		log.Println(err)
 		return
 	}
+	var cryptocurrency storage.PriceMultyFull
 	err = json.Unmarshal(body, &cryptocurrency)
 	if err != nil {
 		log.Print("Unmarshall error: ", err)
 		return
 	}
-	err = storage.Insert(cryptocurrency)
+	response, err = StructureProcessing(cryptocurrency)
 	if err != nil {
-		log.Print("Insert error: ", err)
-		return
+		log.Print("Structure processing error: ", err)
 	}
-	// structureProcessing(cryptocurrency)
+	err = json.Unmarshal(response, &cryptocurrency)
+	if err != nil {
+		log.Print("Unmarshall respons to cryptocurrency error: ", err)
+	}
+	if saveToDB {
+		if cryptocurrency.Display == nil || cryptocurrency.Raw == nil {
+			log.Print("cryptocurrencies is nil")
+			return
+		}
+		err = storage.Insert(cryptocurrency)
+		if err != nil {
+			log.Print("Insert error: ", err)
+			return
+		}
+	}
 	return
 }
 
-func StructureProcessing(cryptocurrency storage.PriceMultyFull) {
-	var raw map[string]map[string]map[string]interface{}
+//StructureProcessing for cutting trash structures fields from response
+func StructureProcessing(cryptocurrency storage.PriceMultyFull) (processedResponse []byte, err error) {
+	var raw map[string]map[string]storage.CurrencyRaw
+	var display map[string]map[string]storage.CurrencyDisplay
 
-	err := json.Unmarshal(cryptocurrency.Raw, &raw)
+	//Unmarshall to cuted structures that we need as map
+	err = json.Unmarshal(cryptocurrency.Raw, &raw)
 	if err != nil {
-		log.Print("Unmarshall error: ", err)
+		log.Print("Unmarshall raw error: ", err)
+		return nil, err
 	}
-	var crc storage.Currency
-	for cryptocurrency := range raw {
-		for _, value := range raw[cryptocurrency] {
-			err := mapstructure.Decode(value, &crc)
-			if err != nil {
-				log.Print("DECODE mapstructure ERROR: ", err)
-			}
-		}
+	err = json.Unmarshal(cryptocurrency.Display, &display)
+	if err != nil {
+		log.Print("Unmarshall display error: ", err)
 	}
-	fmt.Println(crc)
+	//Marshall back to json
+	r, err := json.Marshal(raw)
+	if err != nil {
+		log.Print("MARSHAL MAP ERROR: ", err)
+		return nil, err
+	}
+	d, err := json.Marshal(display)
+	if err != nil {
+		log.Print("MARSHAL MAP ERROR: ", err)
+		return nil, err
+	}
+	//Build necessary response from raw and display
+	processedResponse, err = json.Marshal(storage.PriceMultyFull{Raw: r, Display: d})
+	return processedResponse, err
 }
