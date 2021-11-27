@@ -2,16 +2,19 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 //Init - open database
-func InitDB(connectionString string) error {
-	err := migrate(connectionString)
+func InitDB() error {
+
+	err := migrate()
 	if err != nil {
 		log.Print("Cant execute migrations: ", err)
 		return err
@@ -19,15 +22,18 @@ func InitDB(connectionString string) error {
 	return nil
 }
 
-func migrate(connectionString string) error {
-	db, err := DBConnect(connectionString)
+func migrate() error {
+	db, err := DBConnect()
 	if err != nil {
 		log.Print("InitDB error: ", err)
 		return err
 	}
+
+	//Separating several queries
 	queries, err := parseQueries()
 	if err != nil {
 		log.Print("PARSE QUERIES ERROR: ", err)
+		return err
 	}
 	for _, query := range queries {
 		_, err = db.Exec(string(query))
@@ -58,7 +64,13 @@ func parseQueries() (splitedqueries []string, err error) {
 
 	return
 }
-func DBConnect(connectionString string) (*sql.DB, error) {
+func DBConnect() (*sql.DB, error) {
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	host := os.Getenv("MYSQL_HOST")
+	port := os.Getenv("MYSQL_PORT")
+	dbName := os.Getenv("MYSQL_DB")
+	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, dbName)
 	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
 		log.Println("CANT CONNECT TO DB: ", err)

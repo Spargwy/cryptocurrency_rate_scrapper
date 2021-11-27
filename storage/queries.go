@@ -2,12 +2,10 @@ package storage
 
 import (
 	"log"
-	"os"
 )
 
 func Insert(cryptocurrencies PriceMultyFull) error {
-	connectionString := os.Getenv("MYSQL_CONN")
-	db, err := DBConnect(connectionString)
+	db, err := DBConnect()
 	if err != nil {
 		log.Fatal("Cant connect to database: ", err)
 		return err
@@ -23,8 +21,7 @@ func Insert(cryptocurrencies PriceMultyFull) error {
 }
 
 func Select() (raw, display []byte, err error) {
-	connectionString := os.Getenv("MYSQL_CONN")
-	db, err := DBConnect(connectionString)
+	db, err := DBConnect()
 	if err != nil {
 		log.Fatal("Cant connect to database: ", err)
 		return
@@ -48,8 +45,7 @@ func Select() (raw, display []byte, err error) {
 }
 
 func Update() error {
-	connectionString := os.Getenv("MYSQL_CONN")
-	db, err := DBConnect(connectionString)
+	db, err := DBConnect()
 	if err != nil {
 		log.Fatal("Cant connect to database: ", err)
 		return err

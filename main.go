@@ -6,7 +6,6 @@ import (
 	"cryptorate/storage"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -16,7 +15,7 @@ func init() {
 	if err != nil {
 		log.Fatal("Cant load envs: ", err)
 	}
-	err = storage.InitDB(os.Getenv("MYSQL_CONN"))
+	err = storage.InitDB()
 	if err != nil {
 		log.Fatal("InitDB error: ", err)
 	}
