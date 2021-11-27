@@ -22,7 +22,7 @@ func PeriodicScrapping() error {
 		period = "* * * * *"
 	}
 	_, err := cron.AddFunc(period, func() {
-		_, err := GetCurrentPrice(params, true)
+		_, err := GetCurrentPrice(params, true, true)
 		if err != nil {
 			log.Print("Cant get current price: ", err)
 		}

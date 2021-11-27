@@ -15,7 +15,7 @@ func price(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Unavailable param %s", unavailableParam)
 		return
 	}
-	response, err := scrapper.GetCurrentPrice(r.URL.Query(), false)
+	response, err := scrapper.GetCurrentPrice(r.URL.Query(), false, false)
 	if err != nil {
 		log.Print("get current price error: ", err)
 	}

@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -23,20 +22,29 @@ func Insert(cryptocurrencies PriceMultyFull) error {
 	return nil
 }
 
-func Select() error {
+func Select() (raw, display []byte, err error) {
 	connectionString := os.Getenv("MYSQL_CONN")
 	db, err := DBConnect(connectionString)
 	if err != nil {
 		log.Fatal("Cant connect to database: ", err)
-		return err
+		return
 	}
-	query := "SELECT * FROM cryptocurrency_rate"
+	query := "SELECT raw, display FROM cryptocurrency_rate ORDER BY id DESC LIMIT 1"
 	res, err := db.Query(query)
 	if err != nil {
-		return err
+		log.Print("SELECT Error: ", err)
+		return
 	}
-	fmt.Println(res)
-	return nil
+	defer res.Close()
+	for res.Next() {
+		err = res.Scan(&raw, &display)
+		if err != nil {
+			log.Print("Scan error: ", err)
+			return
+		}
+	}
+
+	return
 }
 
 func Update() error {

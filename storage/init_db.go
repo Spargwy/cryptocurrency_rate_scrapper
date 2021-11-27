@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -24,18 +25,38 @@ func migrate(connectionString string) error {
 		log.Print("InitDB error: ", err)
 		return err
 	}
-	query, err := ioutil.ReadFile("storage/schema.sql")
+	queries, err := parseQueries()
 	if err != nil {
-		log.Print("ReadFile error: ", err)
-		return err
+		log.Print("PARSE QUERIES ERROR: ", err)
 	}
-	_, err = db.Exec(string(query))
-	if err != nil {
-		log.Print("Query exec error: ", err)
-		return err
+	for _, query := range queries {
+		_, err = db.Exec(string(query))
+		if err != nil {
+			log.Print("Query exec error: ", err)
+			return err
+		}
 	}
 
 	return nil
+}
+
+func parseQueries() (splitedqueries []string, err error) {
+	queries, err := ioutil.ReadFile("storage/schema.sql")
+	if err != nil {
+		log.Print("ReadFile error: ", err)
+		return
+	}
+	splitedqueries = strings.Split(string(queries), ";")
+	for i := range splitedqueries {
+		if strings.TrimSpace(splitedqueries[i]) == "" {
+			splitedqueries = append(splitedqueries[:i], splitedqueries[i+1:]...)
+		}
+	}
+	for i := range splitedqueries {
+		splitedqueries[i] += ";"
+	}
+
+	return
 }
 func DBConnect(connectionString string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", connectionString)

@@ -31,10 +31,8 @@ func ParseAvailableParams() map[string][]string {
 	return params
 }
 
-//In request we have map that has as key array of strings
-//But this strings can be locate in same array
-//  so we cant check separate parameter
-//Here we'r solving this problems
+//ParseRequestParams - separates params that included in one
+//place of array
 func ParseRequestParams(params url.Values) url.Values {
 	for param, paramWords := range params {
 		var separatedParams []string
