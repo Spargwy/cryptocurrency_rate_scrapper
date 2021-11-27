@@ -16,6 +16,7 @@ type CurrencyRaw struct {
 	Low24Hour       float64 `json:"LOW24HOUR"`
 	High24Hour      float64 `json:"HIGH24HOUR"`
 	Price           float64 `json:"PRICE"`
+	LastUpdate      int64   `json:"LASTUPDATE"`
 	Supply          float64 `json:"SUPPLY"`
 	Mktcap          float64 `json:"MKTCAP"`
 }
@@ -26,9 +27,11 @@ type CurrencyDisplay struct {
 	Open24Hour      string `json:"OPEN24HOUR"`
 	Volume24Hour    string `json:"VOLUME24HOUR"`
 	Voulume24HourTo string `json:"VOLUME24HOURTO"`
-	Low24Hour       string `json:"LOW24HOUR"`
 	High24Hour      string `json:"HIGH24HOUR"`
 	Price           string `json:"PRICE"`
+	FromSymbol      string `json:"FROMSYMBOL"`
+	ToSymbol        string `json:"TOSYMBOL"`
+	LastUpdate      string `json:"LASTUPDATE"`
 	Supply          string `json:"SUPPLY"`
 	Mktcap          string `json:"MKTCAP"`
 }
