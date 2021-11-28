@@ -10,6 +10,7 @@ import (
 	"github.com/sevlyar/go-daemon"
 )
 
+//Run - run cryptocompare scrapper service
 func Run(port string) {
 	if len(os.Args) == 2 {
 		if os.Args[1] != "-d" {

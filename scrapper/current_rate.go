@@ -53,8 +53,8 @@ func getCurrencyFromDB(requestParams url.Values) (body []byte, err error) {
 	if err != nil {
 		log.Print("Select from db error: ", err)
 	}
-	var rawMap map[string]map[string]storage.CurrencyRaw
-	var displayMap map[string]map[string]storage.CurrencyDisplay
+	var rawMap map[string]map[string]storage.Raw
+	var displayMap map[string]map[string]storage.Display
 	err = json.Unmarshal(raw, &rawMap)
 	if err != nil {
 		log.Print("Unmarshall error: ", err)
@@ -66,7 +66,7 @@ func getCurrencyFromDB(requestParams url.Values) (body []byte, err error) {
 		return
 	}
 
-	//Delete all unnecessery structs
+	//Delete all unnecessary structs
 	for fsym := range rawMap {
 		if !elementInArray(fsym, requestParams["fsyms"]) {
 			delete(rawMap, fsym)
@@ -158,8 +158,8 @@ func responseProcessing(res *http.Response, saveToDB bool) (body []byte, cryptoc
 
 //structureProcessing for cutting trash structures fields from response
 func structureProcessing(cryptocurrency storage.PriceMultyFull) (r, d []byte, err error) {
-	var raw map[string]map[string]storage.CurrencyRaw
-	var display map[string]map[string]storage.CurrencyDisplay
+	var raw map[string]map[string]storage.Raw
+	var display map[string]map[string]storage.Display
 
 	//Unmarshall to cuted structures that we need as map
 	err = json.Unmarshal(cryptocurrency.Raw, &raw)

@@ -24,9 +24,13 @@ func price(w http.ResponseWriter, r *http.Request) {
 		log.Print("get current price error: ", err)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(response)
+	_, err = w.Write(response)
+	if err != nil {
+		w.WriteHeader(500)
+	}
 }
 
+//SetupRoutes - setups available endpoints
 func SetupRoutes() {
 	http.HandleFunc("/price", price)
 }

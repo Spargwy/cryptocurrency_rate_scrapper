@@ -14,6 +14,7 @@ func cronInit() *cron.Cron {
 	return cron
 }
 
+//PeriodicScrapping - sets up periodic scrapping data from cryptocompare
 func PeriodicScrapping() error {
 	cron := cronInit()
 	params := ParseAvailableParams()

@@ -2,12 +2,18 @@ package storage
 
 import "encoding/json"
 
+//PriceMultyFull - describes response structure from cryptocompare api
 type PriceMultyFull struct {
+	//Raw and Display are the only one constant structures
+	//that contains currency and cryptocurrency structures that
+	//differ depending on the request params
 	Raw     json.RawMessage `json:"RAW"`
 	Display json.RawMessage `json:"DISPLAY"`
 }
 
-type CurrencyRaw struct {
+//Raw - describes structure of currency and
+//cryptocurrency that included into Raw and Display field of response
+type Raw struct {
 	Change24Hour    float64 `json:"CHANGE24HOUR"`
 	ChangePCT24Hour float64 `json:"CHANGEPCT24HOUR"`
 	Open24Hour      float64 `json:"OPEN24HOUR"`
@@ -21,7 +27,9 @@ type CurrencyRaw struct {
 	Mktcap          float64 `json:"MKTCAP"`
 }
 
-type CurrencyDisplay struct {
+//Display - describes the second field of response that
+//contains processed data from Raw
+type Display struct {
 	Change24Hour    string `json:"CHANGE24HOUR"`
 	ChangePCT24Hour string `json:"CHANGEPCT24HOUR"`
 	Open24Hour      string `json:"OPEN24HOUR"`

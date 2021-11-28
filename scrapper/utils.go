@@ -30,7 +30,7 @@ func CheckParamsAvailability(params url.Values) (string, bool) {
 	return "", true
 }
 
-//Available params from env variables
+//ParseAvailableParams - get params from env variables
 func ParseAvailableParams() map[string][]string {
 	params := make(map[string][]string)
 	availableFsyms := os.Getenv("AVAILABLE_FSYMS")

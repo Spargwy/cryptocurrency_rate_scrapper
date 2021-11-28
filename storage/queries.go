@@ -4,6 +4,8 @@ import (
 	"log"
 )
 
+//Insert - inserts processed priceMultyFull response as raw
+// and display to db
 func Insert(cryptocurrencies PriceMultyFull) error {
 	db, err := DBConnect()
 	if err != nil {
@@ -20,6 +22,7 @@ func Insert(cryptocurrencies PriceMultyFull) error {
 	return nil
 }
 
+//Select - selects raw and display
 func Select() (raw, display []byte, err error) {
 	db, err := DBConnect()
 	if err != nil {
@@ -42,18 +45,4 @@ func Select() (raw, display []byte, err error) {
 	}
 
 	return
-}
-
-func Update() error {
-	db, err := DBConnect()
-	if err != nil {
-		log.Fatal("Cant connect to database: ", err)
-		return err
-	}
-	query := ""
-	_, err = db.Exec(query)
-	if err != nil {
-		log.Print("Exec error in update: ", err)
-	}
-	return nil
 }

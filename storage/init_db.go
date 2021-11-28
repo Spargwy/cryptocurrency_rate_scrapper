@@ -8,10 +8,10 @@ import (
 	"os"
 	"strings"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" //need to use mysql driver
 )
 
-//Init - open database
+//InitDB - open database and execute sql file
 func InitDB() error {
 
 	err := migrate()
@@ -64,6 +64,8 @@ func parseQueries() (splitedqueries []string, err error) {
 
 	return
 }
+
+//DBConnect - connects to db
 func DBConnect() (*sql.DB, error) {
 	user := os.Getenv("MYSQL_USER")
 	password := os.Getenv("MYSQL_PASSWORD")
