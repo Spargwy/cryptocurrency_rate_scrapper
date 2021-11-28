@@ -9,7 +9,11 @@ import (
 
 func price(w http.ResponseWriter, r *http.Request) {
 	parsedRequestParams := scrapper.ParseRequestParams(r.URL.Query())
-	unavailableParam := scrapper.CheckParamsAvailability(parsedRequestParams)
+	unavailableParam, necesseryParamIsNotAvailable := scrapper.CheckParamsAvailability(parsedRequestParams)
+	if !necesseryParamIsNotAvailable {
+		fmt.Fprintf(w, "fsyms or tsyms param is empty or null")
+		return
+	}
 	if unavailableParam != "" {
 		log.Printf("Unavailable param: %s", unavailableParam)
 		fmt.Fprintf(w, "Unavailable param %s", unavailableParam)

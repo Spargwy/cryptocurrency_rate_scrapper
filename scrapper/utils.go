@@ -6,18 +6,31 @@ import (
 	"strings"
 )
 
-func CheckParamsAvailability(params url.Values) string {
+//CheckParamsAvailability - checking for unavailable params and
+//availability of necessery params
+func CheckParamsAvailability(params url.Values) (string, bool) {
+	if len(params["fsyms"]) == 0 {
+		return "", false
+	} else if len(params["fsyms"]) == 1 && params["fsyms"][0] == "" {
+		return "", false
+	}
+	if len(params["tsyms"]) == 0 {
+		return "", false
+	} else if len(params["tsyms"]) == 1 && params["tsyms"][0] == "" {
+		return "", false
+	}
 	availableParams := ParseAvailableParams()
 	for param, paramWords := range params {
 		for _, paramWord := range paramWords {
 			if !elementInArray(paramWord, availableParams[param]) {
-				return paramWord
+				return paramWord, true
 			}
 		}
 	}
-	return ""
+	return "", true
 }
 
+//Available params from env variables
 func ParseAvailableParams() map[string][]string {
 	params := make(map[string][]string)
 	availableFsyms := os.Getenv("AVAILABLE_FSYMS")

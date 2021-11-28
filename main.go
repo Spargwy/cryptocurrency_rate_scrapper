@@ -1,11 +1,11 @@
 package main
 
 import (
-	"cryptorate/api"
-	"cryptorate/scrapper"
+	"cryptorate/service"
 	"cryptorate/storage"
+	"fmt"
 	"log"
-	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -15,17 +15,16 @@ func init() {
 	if err != nil {
 		log.Fatal("Cant load envs: ", err)
 	}
+	log.Print("Envs loaded")
 	err = storage.InitDB()
 	if err != nil {
 		log.Fatal("InitDB error: ", err)
 	}
-	api.SetupRoutes()
-	err = scrapper.PeriodicScrapping()
-	if err != nil {
-		log.Fatal("Cant add periodic task: ", err)
-	}
+	log.Print("DB inited")
+
 }
 
 func main() {
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
+	service.Run(port)
 }
