@@ -3,7 +3,6 @@ package scrapper
 import (
 	"cryptorate/storage"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,12 +11,12 @@ import (
 
 //GetCurrentPrice get real-time data from cryptocompare.com api, processing response and return it
 func GetCurrentPrice(requestParams url.Values, saveToDB bool, periodic bool) (responseBody []byte, err error) {
-	//If request failed - execute data from db
+	//If request failed - extract data from db
 	res, err := setupAndExecuteRequest(requestParams)
 	if err != nil {
 		log.Print("setupAndExecuteRequest error: ", err)
 
-		//If it is cron task we don't need to execute data from db
+		//If it is a cron task we don't need to extract data from db
 		if !periodic {
 			responseBody, err = getCurrencyFromDB(requestParams)
 			if err != nil {
@@ -57,38 +56,17 @@ func getCurrencyFromDB(requestParams url.Values) (body []byte, err error) {
 	var displayMap map[string]map[string]storage.Display
 	err = json.Unmarshal(raw, &rawMap)
 	if err != nil {
-		log.Print("Unmarshall error: ", err)
+		log.Print("Unmarshall to rawMap error: ", err)
 		return
 	}
 	err = json.Unmarshal(display, &displayMap)
 	if err != nil {
-		log.Print("Unmarshall error: ", err)
+		log.Print("Unmarshall to displayMap error: ", err)
 		return
 	}
 
-	//Delete all unnecessary structs
-	for fsym := range rawMap {
-		if !elementInArray(fsym, requestParams["fsyms"]) {
-			delete(rawMap, fsym)
-			continue
-		}
-		for tsym := range rawMap[fsym] {
-			if !elementInArray(tsym, requestParams["tsyms"]) {
-				delete(rawMap[fsym], tsym)
-			}
-		}
-	}
-	for fsym := range displayMap {
-		if !elementInArray(fsym, requestParams["fsyms"]) {
-			delete(displayMap, fsym)
-			continue
-		}
-		for tsym := range displayMap[fsym] {
-			if !elementInArray(tsym, requestParams["tsyms"]) {
-				delete(displayMap[fsym], tsym)
-			}
-		}
-	}
+	//Delete all unnecessary response parts
+	rawMap, displayMap = processingStructureFromDB(rawMap, displayMap, requestParams)
 	raw, err = json.Marshal(rawMap)
 	if err != nil {
 		log.Print("rawMap Marshal error: ", err)
@@ -129,70 +107,4 @@ func setupAndExecuteRequest(requestParams url.Values) (res *http.Response, err e
 		return
 	}
 	return
-}
-
-//responseProcessing process the response, edit source response struct and return it
-func responseProcessing(res *http.Response, saveToDB bool) (body []byte, cryptocurrency storage.PriceMultyFull, err error) {
-	body, err = ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	err = json.Unmarshal(body, &cryptocurrency)
-	if err != nil {
-		log.Print("Unmarshall error: ", err)
-		return
-	}
-	raw, display, err := structureProcessing(cryptocurrency)
-	if err != nil {
-		log.Print("Structure processing error: ", err)
-	}
-	body = responseFromStructure(raw, display)
-	err = json.Unmarshal(body, &cryptocurrency)
-	if err != nil {
-		log.Print("Unmarshall respons to cryptocurrency error: ", err)
-	}
-
-	return
-}
-
-//structureProcessing for cutting trash structures fields from response
-func structureProcessing(cryptocurrency storage.PriceMultyFull) (r, d []byte, err error) {
-	var raw map[string]map[string]storage.Raw
-	var display map[string]map[string]storage.Display
-
-	//Unmarshall to cuted structures that we need as map
-	err = json.Unmarshal(cryptocurrency.Raw, &raw)
-	if err != nil {
-		log.Print("Unmarshall raw error: ", err)
-		return
-	}
-	err = json.Unmarshal(cryptocurrency.Display, &display)
-	if err != nil {
-		log.Print("Unmarshall display error: ", err)
-	}
-	//Marshall back to json
-	r, err = json.Marshal(raw)
-	if err != nil {
-		log.Print("MARSHAL MAP ERROR: ", err)
-		return
-	}
-	d, err = json.Marshal(display)
-	if err != nil {
-		log.Print("MARSHAL MAP ERROR: ", err)
-		return
-	}
-	//Build necessary response from raw and display
-	return r, d, err
-}
-
-//responseFromStructure creating json response from two different
-//parts of one response - RAW and DISPLAY
-func responseFromStructure(r []byte, d []byte) []byte {
-	//Build necessary response from raw and display
-	processedResponse, err := json.Marshal(storage.PriceMultyFull{Raw: r, Display: d})
-	if err != nil {
-		log.Print("Marshall error: ", err)
-	}
-	return processedResponse
 }

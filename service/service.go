@@ -41,10 +41,12 @@ func Run(port string) {
 	if len(os.Args) > 2 {
 		log.Fatal("Only '-d' argument available")
 	}
+	//setup periodic scrappin
 	err := scrapper.PeriodicScrapping()
 	if err != nil {
 		log.Fatal("Cant add periodic task: ", err)
 	}
+	//setup web api service
 	api.SetupRoutes()
 	log.Fatal(http.ListenAndServe(port, nil))
 }
