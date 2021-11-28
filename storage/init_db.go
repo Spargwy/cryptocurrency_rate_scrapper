@@ -13,7 +13,6 @@ import (
 
 //InitDB - open database and execute sql file
 func InitDB() error {
-
 	err := migrate()
 	if err != nil {
 		log.Print("Cant execute migrations: ", err)
@@ -46,6 +45,7 @@ func migrate() error {
 	return nil
 }
 
+//parseQueries for parse several queries from schema.sql file
 func parseQueries() (splitedqueries []string, err error) {
 	queries, err := ioutil.ReadFile("storage/schema.sql")
 	if err != nil {

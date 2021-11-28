@@ -76,7 +76,7 @@ func elementInArray(element string, array []string) bool {
 }
 
 //responseProcessing process the response, edit source response struct and return it
-func responseProcessing(res *http.Response, saveToDB bool) (body []byte, cryptocurrency storage.PriceMultyFull, err error) {
+func responseProcessing(res *http.Response, saveToDB bool) (body []byte, cryptocurrency storage.PriceMultiFull, err error) {
 	body, err = ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Println(err)
@@ -102,7 +102,7 @@ func responseProcessing(res *http.Response, saveToDB bool) (body []byte, cryptoc
 
 //structureProcessing - conversions response structure into
 //Raw and Display structures
-func structureProcessing(cryptocurrency storage.PriceMultyFull) (r, d []byte, err error) {
+func structureProcessing(cryptocurrency storage.PriceMultiFull) (r, d []byte, err error) {
 	var raw map[string]map[string]storage.Raw
 	var display map[string]map[string]storage.Display
 
@@ -168,7 +168,7 @@ func processingStructureFromDB(raw map[string]map[string]storage.Raw,
 //parts of one response - RAW and DISPLAY
 func responseFromStructure(r []byte, d []byte) []byte {
 	//Build necessary response from raw and display
-	processedResponse, err := json.Marshal(storage.PriceMultyFull{Raw: r, Display: d})
+	processedResponse, err := json.Marshal(storage.PriceMultiFull{Raw: r, Display: d})
 	if err != nil {
 		log.Print("Marshall error: ", err)
 	}

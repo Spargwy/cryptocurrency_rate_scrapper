@@ -77,7 +77,7 @@ func getCurrencyFromDB(requestParams url.Values) (body []byte, err error) {
 		log.Print("displayMap Marshal error: ", err)
 		return
 	}
-	body, err = json.Marshal(storage.PriceMultyFull{Raw: raw, Display: display})
+	body, err = json.Marshal(storage.PriceMultiFull{Raw: raw, Display: display})
 	return
 }
 

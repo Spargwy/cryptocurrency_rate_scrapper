@@ -4,9 +4,9 @@ import (
 	"log"
 )
 
-//Insert - inserts processed priceMultyFull response as raw
+//Insert - inserts processed priceMultiFull response as raw
 // and display to db
-func Insert(cryptocurrencies PriceMultyFull) error {
+func Insert(cryptocurrencies PriceMultiFull) error {
 	db, err := DBConnect()
 	if err != nil {
 		log.Fatal("Cant connect to database: ", err)

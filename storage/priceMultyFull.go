@@ -2,8 +2,8 @@ package storage
 
 import "encoding/json"
 
-//PriceMultyFull - describes response structure from cryptocompare api
-type PriceMultyFull struct {
+//PriceMultiFull - describes response structure from cryptocompare api
+type PriceMultiFull struct {
 	//Raw and Display are the only one constant structures
 	//that contains currency and cryptocurrency structures that
 	//differ depending on the request params
